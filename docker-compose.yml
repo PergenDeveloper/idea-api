@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  api:
+    ports:
+      - 8000:8000
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        STATIC_URL: "/static/"
+    restart: unless-stopped
+    networks:
+      - ideaz1-backend-tier
+    depends_on:
+      - db
+      - rabbitmq
+    volumes:
+      # shared volume between worker and api for media
+      - ideaz1-media:/app/media
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: common.env
+
+  db:
+    image: library/postgres:11.1-alpine
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    networks:
+      - ideaz1-backend-tier
+    volumes:
+      - ideaz1-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=ideaz1
+      - POSTGRES_PASSWORD=ideaz1
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    restart: unless-stopped
+    networks:
+      - ideaz1-backend-tier
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        STATIC_URL: "/static/"
+    command: celery -A ideaz1 --app=ideaz1.celeryconf:app worker --loglevel=info -B
+    restart: unless-stopped
+    networks:
+      - ideaz1-backend-tier
+    env_file: common.env
+    depends_on:
+      - rabbitmq
+      - mailhog
+    volumes:
+      # shared volume between worker and api for media
+      - ideaz1-media:/app/media
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui. Visit http://localhost:8025/ to check emails
+    restart: unless-stopped
+    networks:
+      - ideaz1-backend-tier
+
+volumes:
+  ideaz1-db:
+    driver: local
+  ideaz1-media:
+
+networks:
+  ideaz1-backend-tier:
+    driver: bridge

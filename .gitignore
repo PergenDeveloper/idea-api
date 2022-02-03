@@ -6,6 +6,11 @@
 __pycache__
 db.sqlite3
 media
+.*
+**/*.pyc
+*.sqlite
+node_modules
+static
 
 # Visual Studio Code # 
 .vscode/* 

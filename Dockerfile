@@ -15,7 +15,7 @@ RUN pip install -r requirements.txt
 ### Final image
 FROM python:3.9-slim
 
-RUN groupadd -r ideaz1 && useradd -r -g ideaz1 ideaz1
+RUN groupadd -r api && useradd -r -g api api
 
 RUN apt-get update \
   && apt-get install -y \
@@ -37,7 +37,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /app/media /app/static \
-  && chown -R ideaz1:ideaz1 /app/
+  && chown -R api:api /app/
 
 COPY --from=build-python /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages/
 COPY --from=build-python /usr/local/bin/ /usr/local/bin/
@@ -49,4 +49,4 @@ RUN SECRET_KEY=dummy STATIC_URL=${STATIC_URL} python3 manage.py collectstatic --
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
-CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "--worker-class", "ideaz1.asgi.gunicorn_worker.UvicornWorker", "ideaz1.asgi:application"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "--worker-class", "idea.asgi.gunicorn_worker.UvicornWorker", "idea.asgi:application"]

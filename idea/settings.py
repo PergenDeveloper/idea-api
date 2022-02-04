@@ -36,7 +36,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ideaz1.urls'
+ROOT_URLCONF = 'idea.urls'
 
 TEMPLATES = [
     {
@@ -54,23 +54,21 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ideaz1.wsgi.application'
+WSGI_APPLICATION = 'idea.wsgi.application'
 
 
 # Database
-
 DATABASE_CONNECTION_DEFAULT_NAME="default"
 
 DATABASES = {
     DATABASE_CONNECTION_DEFAULT_NAME: dj_database_url.config(
-        default=os.environ.get("DATABASE_URL", ""),
+        default=os.environ.get("DATABASE_URL"),
         conn_max_age=600
     ),
 }
 
 
 # Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -107,9 +105,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CELERY SETTINGS
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_BROKER_URL = (
-    os.environ.get("CELERY_BROKER_URL", "")
-)
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"

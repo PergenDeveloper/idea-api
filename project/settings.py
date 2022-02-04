@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'project.account',
+    'project.publication',
 ]
 
 INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS

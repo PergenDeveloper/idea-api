@@ -21,7 +21,7 @@ def setup_celery_logging(loglevel=None, **kwargs):
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "idea.settings")
 
-app = Celery("saleor")
+app = Celery("idea")
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

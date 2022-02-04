@@ -52,7 +52,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         STATIC_URL: "/static/"
-    command: celery -A idea --app=idea.celeryconf:app worker --loglevel=info -B
+    command: celery -A project --app=project.celeryconf:app worker --loglevel=info -B
     restart: unless-stopped
     networks:
       - backend

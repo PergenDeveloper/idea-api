@@ -49,4 +49,4 @@ RUN SECRET_KEY=dummy STATIC_URL=${STATIC_URL} python3 manage.py collectstatic --
 EXPOSE 8000
 ENV PYTHONUNBUFFERED 1
 
-CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "--worker-class", "idea.asgi.gunicorn_worker.UvicornWorker", "idea.asgi:application"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "4", "--worker-class", "project.asgi.gunicorn_worker.UvicornWorker", "project.asgi:application"]

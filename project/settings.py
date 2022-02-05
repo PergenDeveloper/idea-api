@@ -2,6 +2,10 @@
 import os
 from pathlib import Path
 import dj_database_url
+import dj_email_url
+
+def get_list(text):
+    return [item.strip() for item in text.split(",")]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -12,7 +16,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "development")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get("DEBUG", 1))
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = get_list(os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1"))
+
+MAIN_DOMAIN = os.environ.get("MAIN_DOMAIN", "127.0.0.1:8000")
 
 
 # Application definition
@@ -95,6 +101,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 AUTH_USER_MODEL = "account.User"
 
 
@@ -129,4 +140,32 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", None)
 # GRAPHENE SETTINGS
 GRAPHENE = {
     'SCHEMA': 'project.graphql.api.schema',
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
 }
+
+
+EMAIL_URL = os.environ.get("EMAIL_URL")
+SENDGRID_USERNAME = os.environ.get("SENDGRID_USERNAME")
+SENDGRID_PASSWORD = os.environ.get("SENDGRID_PASSWORD")
+if not EMAIL_URL and SENDGRID_USERNAME and SENDGRID_PASSWORD:
+    EMAIL_URL = "smtp://%s:%s@smtp.sendgrid.net:587/?tls=True" % (
+        SENDGRID_USERNAME,
+        SENDGRID_PASSWORD,
+    )
+
+email_config = dj_email_url.parse(
+    EMAIL_URL or "console://demo@example.com:console@example/"
+)
+
+EMAIL_FILE_PATH = email_config["EMAIL_FILE_PATH"]
+EMAIL_HOST_USER = email_config["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = email_config["EMAIL_HOST_PASSWORD"]
+EMAIL_HOST = email_config["EMAIL_HOST"]
+EMAIL_PORT = email_config["EMAIL_PORT"]
+EMAIL_BACKEND = email_config["EMAIL_BACKEND"]
+EMAIL_USE_TLS = email_config["EMAIL_USE_TLS"]
+EMAIL_USE_SSL = email_config["EMAIL_USE_SSL"]
+
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@example.com")

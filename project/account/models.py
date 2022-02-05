@@ -1,3 +1,4 @@
+import uuid
 from typing import Iterable
 from django.utils import timezone
 from django.contrib.auth.models import (
@@ -98,3 +99,13 @@ class Follow(models.Model):
         choices=FollowStatus.CHOICES,
         default=FollowStatus.PENDING
     )
+
+
+class OneTimeToken(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name="one_time_tokens",
+        on_delete=models.CASCADE
+    )
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    valid = models.BooleanField(default=True)

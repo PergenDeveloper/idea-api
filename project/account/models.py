@@ -6,6 +6,11 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+from django.db.models import (
+    Exists,
+    OuterRef,
+    Q,
+)
 from django.db import models
 
 from . import FollowStatus
@@ -59,7 +64,6 @@ class User(PermissionsMixin, AbstractBaseUser):
             self.followers
             .select_related('follower')
             .filter(status=FollowStatus.ACCEPTED)
-            .values("follower")
         )
 
     def get_following(self)  -> Iterable['User']:
@@ -69,8 +73,8 @@ class User(PermissionsMixin, AbstractBaseUser):
             self.following
             .select_related('following')
             .filter(status=FollowStatus.ACCEPTED)
-            .values("following")
         )
+
 
     def get_follower_requests(self)  -> Iterable['User']:
         if not hasattr(self, 'followers'):
@@ -79,7 +83,6 @@ class User(PermissionsMixin, AbstractBaseUser):
             self.followers
             .select_related('follower')
             .filter(status=FollowStatus.PENDING)
-            .values("follower")
         )
 
 
@@ -99,6 +102,10 @@ class Follow(models.Model):
         choices=FollowStatus.CHOICES,
         default=FollowStatus.PENDING
     )
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    class Meta:
+        unique_together = ('follower', 'following',)
 
 
 class OneTimeToken(models.Model):

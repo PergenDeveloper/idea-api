@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -17,4 +18,8 @@ class Publication(models.Model):
         choices=PublicationVisibility.CHOICES,
         default=PublicationVisibility.PUBLIC
     )
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+    
+    class Meta:
+        ordering = ('-created_at',)

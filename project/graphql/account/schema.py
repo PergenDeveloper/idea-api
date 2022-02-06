@@ -1,17 +1,21 @@
 import graphene
 import graphql_jwt as jwt
-from graphql import GraphQLError
+from graphql_jwt.decorators import login_required
 
-from ..publication.types import PublicationType
-from .mutations import (
+from .mutations.account import (
     AccountRegister, 
-    ConfirmPasswordReset,
+    PasswordResetConfirm,
+    PasswordChange,
+    PasswordResetRequest,
+)
+from .mutations.auth import (
+    TokenCreate,
+)
+from .mutations.follow import (
     FollowAccount,
     FollowAccountConfirm,
     FollowAccountReject,
     FollowerRemove,
-    PasswordChange,
-    RequestPasswordReset,
     UnfollowAccount,
 )
 from .types import UserType
@@ -27,22 +31,13 @@ class AccountQueries(graphene.ObjectType):
         first=graphene.Argument(graphene.Int),
         skip=graphene.Argument(graphene.Int)
     )
-    timeline = graphene.List(
-        PublicationType,
-        first=graphene.Argument(graphene.Int),
-        skip=graphene.Argument(graphene.Int)
-    )
 
+    @login_required
     def resolve_me(self, info, **kwargs):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged.')
-        return user
+        return info.context.user
     
+    @login_required
     def resolve_search_users(self, info, search=None, first=None, skip=None, **kwargs):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged.')
         return resolve_search_users(info, search, first, skip)
 
 
@@ -51,14 +46,14 @@ class AccountMutations(graphene.ObjectType):
     account_register = AccountRegister.Field()
 
     # Token mutations
-    create_token = jwt.ObtainJSONWebToken.Field()
-    verify_token = jwt.Verify.Field()
-    refresh_token = jwt.Refresh.Field()
+    token_create = TokenCreate.Field()
+    token_verify = jwt.Verify.Field()
+    token_refresh = jwt.Refresh.Field()
 
     # Password mutations
     password_change = PasswordChange.Field()
-    request_password_reset = RequestPasswordReset.Field()
-    confirm_password_reset = ConfirmPasswordReset.Field()
+    password_reset_request = PasswordResetRequest.Field()
+    password_reset_confirm = PasswordResetConfirm.Field()
 
     # Follow mutations
     follow_account = FollowAccount.Field()

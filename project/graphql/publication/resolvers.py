@@ -4,25 +4,28 @@ from django.db.models import (
     OuterRef,
     Q,
 )
-from ...publication import PublicationVisibility, models
+from ...publication.models import Publication
+from ...publication import PublicationVisibility
+
 
 
 def resolve_timeline(info, first, skip):
     requestor = info.context.user
     following = requestor.get_following()
 
-    queryset = models.Publication.objects.all()
-    queryset = queryset.filter(
-        Q(user=requestor)
-        | Q(visibility=PublicationVisibility.PUBLIC)
-        | Q(
-            Exists(following.filter(following__id=OuterRef("user_id"))),
-            visibility=PublicationVisibility.PROTECTED
-        ),
+    publications = (
+        Publication.objects.filter(
+            Q(user=requestor)
+            | Q(visibility=PublicationVisibility.PUBLIC)
+            | Q(
+                Exists(following.filter(following__id=OuterRef("user_id"))),
+                visibility=PublicationVisibility.PROTECTED
+            ),
+        )
     )
     if skip:
-        queryset = queryset[skip:]
+        publications = publications[skip:]
     if first:
-        queryset = queryset[:first]
+        publications = publications[:first]
 
-    return queryset
+    return publications

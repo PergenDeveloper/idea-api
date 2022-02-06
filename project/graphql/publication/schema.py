@@ -1,6 +1,6 @@
 import graphene
+from graphql_jwt.decorators import login_required
 
-from ...publication import models
 from .mutations import (
     PublicationCreate, 
     PublicationDelete,
@@ -10,6 +10,7 @@ from .types import PublicationType
 from .resolvers import resolve_timeline
 
 
+
 class PublicationQueries(graphene.ObjectType):
     timeline = graphene.List(
         PublicationType,
@@ -17,6 +18,7 @@ class PublicationQueries(graphene.ObjectType):
         skip=graphene.Argument(graphene.Int)
     )
     
+    @login_required
     def resolve_timeline(self, info, first=None, skip=None, **kwargs):
         return resolve_timeline(info, first, skip)
 

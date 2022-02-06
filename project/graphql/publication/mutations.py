@@ -1,5 +1,6 @@
 import graphene
 from graphql import GraphQLError
+from graphql_jwt.decorators import login_required
 
 from ...publication import models, tasks
 from ..publication.enums import PublicationVisibilityEnum
@@ -32,11 +33,10 @@ class PublicationCreate(graphene.Mutation):
         )
 
     @classmethod
+    @login_required
     def mutate(cls, _, info, **kwargs):
         user = info.context.user
         data = kwargs.get('input')
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged.')
         
         publication = models.Publication(
             user=user,
@@ -64,13 +64,11 @@ class PublicationUpdate(graphene.Mutation):
         )
 
     @classmethod
+    @login_required
     def mutate(cls, _, info, **kwargs):
         user = info.context.user
         id = kwargs.get('id')
         data = kwargs.get('input')
-
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged.')
 
         publication = user.publications.filter(uuid=id).first()
 
@@ -79,7 +77,7 @@ class PublicationUpdate(graphene.Mutation):
         
         publication.text = data.get("text", publication.text)
         publication.visibility = data.get("visibility", publication.visibility)
-        publication.save()
+        publication.save(update_fields=['text', 'visibility'])
 
         return cls(publication=publication)
 
@@ -96,12 +94,10 @@ class PublicationDelete(graphene.Mutation):
         )
 
     @classmethod
+    @login_required
     def mutate(cls, _, info, **kwargs):
         user = info.context.user
         id = kwargs.get('id')
-
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged.')
 
         publication = user.publications.filter(uuid=id).first()
 

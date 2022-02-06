@@ -4,72 +4,72 @@ from django.db.models import (
     Q,
 )
 from ...publication import PublicationVisibility
-from ...account import models
+from ...account.models import User
 
 def resolve_search_users(info, search, first, skip):
-    queryset = models.User.objects.all()
+    users = User.objects.all()
     if search:
-        queryset = queryset.filter(username__icontains=search)
+        users = users.filter(username__icontains=search)
     if skip:
-        queryset = queryset[skip:]
+        users = users[skip:]
     if first:
-        queryset = queryset[:first]
+        users = users[:first]
 
-    return queryset
+    return users
 
 
 def resolve_publications(info, user, first, skip):
     requestor = info.context.user
     if user != requestor:
-        following = requestor.get_following()
-        queryset = user.publications.filter(
+        follows = requestor.get_following()
+        publications = user.publications.filter(
             Q(visibility=PublicationVisibility.PUBLIC)
             | Q(
-                Exists(following.filter(following__id=OuterRef("user_id"))), 
+                Exists(follows.filter(following__id=OuterRef("user_id"))), 
                 visibility=PublicationVisibility.PROTECTED
             ),
         )
     else:
-        queryset = user.publications.all()
+        publications = user.publications.all()
     if skip:
-        queryset = queryset[skip:]
+        publications = publications[skip:]
     if first:
-        queryset = queryset[:first]
-    return queryset
+        publications = publications[:first]
+    return publications
 
 
 def resolve_following(root, first, skip):
     following = root.get_following()
-    qs = models.User.objects.filter(
+    users = User.objects.filter(
         Exists(following.filter(following__id=OuterRef("pk"))),
     )
     if skip:
-        qs = qs[skip:] 
+        users = users[skip:] 
     if first:
-        qs = qs[:first] 
-    return qs
+        users = users[:first] 
+    return users
 
 def resolve_followers(root, first, skip):
     followers = root.get_followers()
-    qs = models.User.objects.filter(
+    users = User.objects.filter(
         Exists(followers.filter(follower__id=OuterRef("pk"))),
     )
 
     if skip:
-        qs = qs[skip:] 
+        users = users[skip:] 
     if first:
-        qs = qs[:first] 
-    return qs
+        users = users[:first] 
+    return users
 
 def resolve_follower_requests(root, first, skip):
     followers_request = root.get_follower_requests()
-    qs =  models.User.objects.filter(
-        Exists(followers_request.filter(follower__id=OuterRef("pk"))),
+    users = User.objects.filter(
+        Exists(followers_request.filter(follower__id=OuterRef("id"))),
     )
 
     if skip:
-        qs = qs[skip:] 
+        users = users[skip:] 
     if first:
-        qs = qs[:first] 
-    return qs
+        users = users[:first] 
+    return users
 

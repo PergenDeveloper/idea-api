@@ -16,22 +16,26 @@ El proyecto cuenta con los siguientes servicios:
 NOTA: El fichero con variables entorno está subido en el repo, pero no es recomendable hacerlo en proyectos reales.
 
 
-### Instalar y activar un entorno virtual
+## Instalar y activar un entorno virtual
 > `python3 -m venv idea-api`
 >
 > `source  idea-api/bin/activate`
 
-### Clonar el proyecto
+## Clonar el proyecto
 > `git clone https://github.com/PergenDeveloper/idea-api.git`
 >
 > `cd idea-api`
 
-### Entorno desarrollo
-#### Aplicar las migraciones (el servicio de base de datos debe estar levantado)
+## Entorno desarrollo
+### Aplicar las migraciones (el servicio de base de datos debe estar levantado)
 > `docker-compose run api python manage.py migrate`
 
 #### Levantar el proyecto
 > `docker-compose up`
+
+### Para desarrollar código
+#### Instalar dependencias del proyecto
+> `pip install -r requirements.txt`
 
 #### Chequear la calidad de código antes de commit
 He preparado el proyecto para que realice un chequeo de la calidad de código antes de cada commit, así nos aseguramos

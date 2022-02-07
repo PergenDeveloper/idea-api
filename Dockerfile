@@ -8,9 +8,9 @@ RUN apt-get -y update \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements /app/
+COPY requirements.txt /app/
 WORKDIR /app
-RUN pip install -r requirements/dev.txt
+RUN pip install -r requirements.txt
 
 ### Final image
 FROM python:3.9-slim

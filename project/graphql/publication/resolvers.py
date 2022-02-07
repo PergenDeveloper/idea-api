@@ -1,10 +1,12 @@
+from typing import Optional
+
 from django.db.models import Exists, OuterRef, Q
 
 from ...publication import PublicationVisibility
 from ...publication.models import Publication
 
 
-def resolve_timeline(info, first, skip):
+def resolve_timeline(info, first: Optional[int], skip: Optional[int]):
     requestor = info.context.user
     following = requestor.get_following()
 

@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphql_jwt.decorators import login_required
 
 from ...account import models
 from ..publication.types import PublicationType
@@ -40,16 +41,19 @@ class UserType(DjangoObjectType):
             "username",
         )
 
+    @login_required
     def resolve_followers(root: models.User, info, first=None, skip=None, **kwargs):
         if info.context.user != root:
             return None
         return resolve_followers(root, first, skip)
 
+    @login_required
     def resolve_following(root: models.User, info, first=None, skip=None, **kwargs):
         if info.context.user != root:
             return None
         return resolve_following(root, first, skip)
 
+    @login_required
     def resolve_follower_requests(
         root: models.User, info, first=None, skip=None, **kwargs
     ):
@@ -57,6 +61,7 @@ class UserType(DjangoObjectType):
             return None
         return resolve_follower_requests(root, first, skip)
 
+    @login_required
     def resolve_publications(root: models.User, info, first=None, skip=None, **kwargs):
         return resolve_publications(info, root, first, skip)
 

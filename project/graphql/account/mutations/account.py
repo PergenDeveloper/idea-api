@@ -25,7 +25,8 @@ class PasswordChangeInput(graphene.InputObjectType):
 
 
 class AccountRegister(graphene.Mutation):
-    user = graphene.Field(UserType)
+    email = graphene.String()
+    username = graphene.String()
 
     class Arguments:
         input = AccountRegisterInput(
@@ -66,7 +67,7 @@ class AccountRegister(graphene.Mutation):
         user.set_password(password)
         user.save()
 
-        return cls(user=user)
+        return cls(email=user.email, username=user.username)
 
 
 class PasswordChange(graphene.Mutation):

@@ -38,8 +38,8 @@ class UserManager(BaseUserManager):
 
 
 class User(PermissionsMixin, AbstractBaseUser):
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(unique=True, db_index=True)
+    username = models.CharField(max_length=50, unique=True, db_index=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now, editable=False)

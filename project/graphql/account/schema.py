@@ -8,7 +8,6 @@ from .mutations.account import (
     PasswordResetConfirm,
     PasswordResetRequest,
 )
-from .mutations.auth import TokenCreate
 from .mutations.follow import (
     FollowAccount,
     FollowAccountConfirm,
@@ -43,7 +42,7 @@ class AccountMutations(graphene.ObjectType):
     account_register = AccountRegister.Field()
 
     # Token mutations
-    token_create = TokenCreate.Field()
+    token_create = jwt.ObtainJSONWebToken.Field()
     token_verify = jwt.Verify.Field()
     token_refresh = jwt.Refresh.Field()
 

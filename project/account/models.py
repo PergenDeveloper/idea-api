@@ -1,36 +1,31 @@
 import uuid
-from typing import Iterable
-from django.utils import timezone
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
-from django.db.models import (
-    Exists,
-    OuterRef,
-    Q,
-)
 from django.db import models
+from django.utils import timezone
 
 from . import FollowStatus
 
+
 class UserManager(BaseUserManager):
-    def create_user(
-        self, email,  username, password=None, **extra_fields 
-    ):
+    def create_user(self, email, username, password=None, **extra_fields):
         """Create a user instance with the given email, username and password."""
-        values = [email, username,]
+        values = [
+            email,
+            username,
+        ]
         field_value_map = dict(zip(self.model.REQUIRED_FIELDS, values))
         for field_name, value in field_value_map.items():
             if not value:
-                raise ValueError(f'The {field_name} value must be set')
+                raise ValueError(f"The {field_name} value must be set")
 
         email = UserManager.normalize_email(email)
 
-        user = self.model(
-            email=email, username=username, **extra_fields
-        )
+        user = self.model(email=email, username=username, **extra_fields)
         if password:
             user.set_password(password)
         user.save()
@@ -49,40 +44,35 @@ class User(PermissionsMixin, AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username',] 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = [
+        "username",
+    ]
 
     objects = UserManager()
 
     def __str__(self) -> str:
         return self.username
 
-    def get_followers(self) -> Iterable['User']:
-        if not hasattr(self, 'followers'):
+    def get_followers(self):
+        if not hasattr(self, "followers"):
             return []
-        return (
-            self.followers
-            .select_related('follower')
-            .filter(status=FollowStatus.ACCEPTED)
+        return self.followers.select_related("follower").filter(
+            status=FollowStatus.ACCEPTED
         )
 
-    def get_following(self)  -> Iterable['User']:
-        if not hasattr(self, 'following'):
+    def get_following(self):
+        if not hasattr(self, "following"):
             return []
-        return (
-            self.following
-            .select_related('following')
-            .filter(status=FollowStatus.ACCEPTED)
+        return self.following.select_related("following").filter(
+            status=FollowStatus.ACCEPTED
         )
 
-
-    def get_follower_requests(self)  -> Iterable['User']:
-        if not hasattr(self, 'followers'):
+    def get_follower_requests(self):
+        if not hasattr(self, "followers"):
             return []
-        return (
-            self.followers
-            .select_related('follower')
-            .filter(status=FollowStatus.PENDING)
+        return self.followers.select_related("follower").filter(
+            status=FollowStatus.PENDING
         )
 
 
@@ -98,21 +88,26 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
     )
     status = models.CharField(
-        max_length=10,
-        choices=FollowStatus.CHOICES,
-        default=FollowStatus.PENDING
+        max_length=10, choices=FollowStatus.CHOICES, default=FollowStatus.PENDING
     )
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     class Meta:
-        unique_together = ('follower', 'following',)
+        unique_together = (
+            "follower",
+            "following",
+        )
+
+    def __str__(self) -> str:
+        return f"{self.follower} -> {self.following}"
 
 
 class OneTimeToken(models.Model):
     user = models.ForeignKey(
-        User,
-        related_name="one_time_tokens",
-        on_delete=models.CASCADE
+        User, related_name="one_time_tokens", on_delete=models.CASCADE
     )
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     valid = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return self.token

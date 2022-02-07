@@ -1,4 +1,3 @@
-
 class FollowStatus:
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"

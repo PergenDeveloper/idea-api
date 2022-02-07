@@ -3,14 +3,12 @@ import graphql_jwt as jwt
 from graphql_jwt.decorators import login_required
 
 from .mutations.account import (
-    AccountRegister, 
-    PasswordResetConfirm,
+    AccountRegister,
     PasswordChange,
+    PasswordResetConfirm,
     PasswordResetRequest,
 )
-from .mutations.auth import (
-    TokenCreate,
-)
+from .mutations.auth import TokenCreate
 from .mutations.follow import (
     FollowAccount,
     FollowAccountConfirm,
@@ -18,9 +16,8 @@ from .mutations.follow import (
     FollowerRemove,
     UnfollowAccount,
 )
-from .types import UserType
 from .resolvers import resolve_search_users
-
+from .types import UserType
 
 
 class AccountQueries(graphene.ObjectType):
@@ -29,16 +26,16 @@ class AccountQueries(graphene.ObjectType):
         UserType,
         search=graphene.Argument(graphene.String),
         first=graphene.Argument(graphene.Int),
-        skip=graphene.Argument(graphene.Int)
+        skip=graphene.Argument(graphene.Int),
     )
 
     @login_required
     def resolve_me(self, info, **kwargs):
         return info.context.user
-    
+
     @login_required
     def resolve_search_users(self, info, search=None, first=None, skip=None, **kwargs):
-        return resolve_search_users(info, search, first, skip)
+        return resolve_search_users(search, first, skip)
 
 
 class AccountMutations(graphene.ObjectType):
@@ -61,5 +58,3 @@ class AccountMutations(graphene.ObjectType):
     follow_account_reject = FollowAccountReject.Field()
     unfollow_account = UnfollowAccount.Field()
     follower_remove = FollowerRemove.Field()
-
-

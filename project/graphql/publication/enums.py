@@ -1,4 +1,5 @@
 import graphene
+
 from ...publication import PublicationVisibility
 
 PublicationVisibilityEnum = graphene.Enum(

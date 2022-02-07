@@ -2,8 +2,8 @@ import graphene
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required
 
-from ....account.models import User, Follow
 from ....account import FollowStatus
+from ....account.models import Follow, User
 
 
 class FollowAccount(graphene.Mutation):
@@ -11,8 +11,7 @@ class FollowAccount(graphene.Mutation):
 
     class Arguments:
         username = graphene.String(
-            required=True,
-            description="Username of user to follow."
+            required=True, description="Username of user to follow."
         )
 
     @classmethod
@@ -22,11 +21,9 @@ class FollowAccount(graphene.Mutation):
         username = kwargs.get("username")
 
         if user.username == username:
-             raise GraphQLError('You can not follow yourself.')
+            raise GraphQLError("You can not follow yourself.")
 
-        user_to_follow = (
-            User.objects.filter(username=username).first()
-        )
+        user_to_follow = User.objects.filter(username=username).first()
 
         if not user_to_follow:
             raise GraphQLError("User with this username doesn't exists.")
@@ -34,10 +31,7 @@ class FollowAccount(graphene.Mutation):
         if Follow.objects.filter(follower=user, following=user_to_follow).exists():
             raise GraphQLError("You can not follow a user twice.")
 
-        Follow.objects.create(
-            follower=user,
-            following=user_to_follow
-        )
+        Follow.objects.create(follower=user, following=user_to_follow)
 
         return cls(followed=True)
 
@@ -47,8 +41,7 @@ class UnfollowAccount(graphene.Mutation):
 
     class Arguments:
         username = graphene.String(
-            required=True,
-            description="Username of user to unfollow."
+            required=True, description="Username of user to unfollow."
         )
 
     @classmethod
@@ -58,8 +51,7 @@ class UnfollowAccount(graphene.Mutation):
         username = kwargs.get("username")
 
         follow = Follow.objects.filter(
-            follower=user, 
-            following__username=username
+            follower=user, following__username=username
         ).first()
 
         if not follow:
@@ -75,8 +67,7 @@ class FollowAccountConfirm(graphene.Mutation):
 
     class Arguments:
         username = graphene.String(
-            required=True,
-            description="Username of user to follow."
+            required=True, description="Username of user to follow."
         )
 
     @classmethod
@@ -86,16 +77,14 @@ class FollowAccountConfirm(graphene.Mutation):
         username = kwargs.get("username")
 
         follow = Follow.objects.filter(
-            follower__username=username,
-            following=user,
-            status=FollowStatus.PENDING
+            follower__username=username, following=user, status=FollowStatus.PENDING
         ).first()
 
         if not follow:
             raise GraphQLError("This user not follow you.")
 
         follow.status = FollowStatus.ACCEPTED
-        follow.save(update_fields=['status'])
+        follow.save(update_fields=["status"])
 
         return cls(follow_confirmed=True)
 
@@ -105,8 +94,7 @@ class FollowAccountReject(graphene.Mutation):
 
     class Arguments:
         username = graphene.String(
-            required=True,
-            description="Username of user to follow."
+            required=True, description="Username of user to follow."
         )
 
     @classmethod
@@ -116,9 +104,7 @@ class FollowAccountReject(graphene.Mutation):
         username = kwargs.get("username")
 
         follow = Follow.objects.filter(
-            follower__username=username,
-            following=user,
-            status=FollowStatus.PENDING
+            follower__username=username, following=user, status=FollowStatus.PENDING
         ).first()
 
         if not follow:
@@ -134,8 +120,7 @@ class FollowerRemove(graphene.Mutation):
 
     class Arguments:
         username = graphene.String(
-            required=True,
-            description="Username of user to follow."
+            required=True, description="Username of user to follow."
         )
 
     @classmethod
@@ -145,9 +130,7 @@ class FollowerRemove(graphene.Mutation):
         username = kwargs.get("username")
 
         follow = Follow.objects.filter(
-            follower__username=username,
-            following=user,
-            status=FollowStatus.ACCEPTED
+            follower__username=username, following=user, status=FollowStatus.ACCEPTED
         ).first()
 
         if not follow:

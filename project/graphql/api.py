@@ -1,6 +1,7 @@
 import graphene
-from .account.schema import AccountQueries, AccountMutations
-from .publication.schema import PublicationQueries, PublicationMutations
+
+from .account.schema import AccountMutations, AccountQueries
+from .publication.schema import PublicationMutations, PublicationQueries
 
 
 class Query(
@@ -17,5 +18,6 @@ class Mutation(
     graphene.ObjectType,
 ):
     pass
+
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

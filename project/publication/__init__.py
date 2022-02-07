@@ -1,4 +1,3 @@
-
 class PublicationVisibility:
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"

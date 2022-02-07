@@ -1,4 +1,3 @@
-
 import graphene
 from graphene_django import DjangoObjectType
 
@@ -13,15 +12,11 @@ class PublicationType(DjangoObjectType):
 
     class Meta:
         model = models.Publication
-        fields = (
-            "id",
-            'text',
-            'created_at'
-        )
+        fields = ("id", "text", "created_at")
 
     @classmethod
     def get_queryset(cls, queryset, info):
-        return queryset.select_related('user')
+        return queryset.select_related("user")
 
     def resolve_username(root: models.Publication, info, **kwargs):
         return root.user.username

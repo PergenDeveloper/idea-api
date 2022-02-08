@@ -7,10 +7,10 @@ Prueba backend planteada desde la empresa
 Para realizar los siguientes pasos, debes tener instalado el **docker** y **docker-compose** en tu maquina.
 
 El proyecto cuenta con los siguientes servicios:
-- `api:` Servicio que contiene la aplicación y en el corremos la api.
+- `api:` Servicio que contiene la aplicación y en él corremos la api.
 - `db:` Servicio en el que se ejecuta la base de datos.
 - `rabbitmq:` Servicio que corre rabbit como broker que usamos para procesar las peticiones de celery.
-- `worker:` Servicio que ejecuta celery para el procesamiendo de tareas en segundo plato.
+- `worker:` Servicio que ejecuta celery para el procesamiendo de tareas en segundo plano.
 - `mailhog:` Servicio que ejecuta el gestor de mensajes SMTP para desarrollo.
 
 NOTA: El fichero con variables entorno está subido en el repo, pero no es recomendable hacerlo en proyectos reales.

@@ -6,16 +6,15 @@
 __pycache__
 db.sqlite3
 media
-.*
 **/*.pyc
 *.sqlite
 node_modules
 static
 
-# Visual Studio Code # 
-.vscode/* 
-!.vscode/settings.json 
-!.vscode/tasks.json 
-!.vscode/launch.json 
-!.vscode/extensions.json 
+# Visual Studio Code #
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .history

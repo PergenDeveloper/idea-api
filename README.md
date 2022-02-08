@@ -50,4 +50,4 @@ Los test no he podido añadirlos, pero podríamos escribirlos con pytest.
 
 #### Notificación a usuarios
 He implementado el envio de email para notificar a los usuarios sobre una nueva publicación. También
-podría ser usado Firebase para este fin.
+podría ser usado Firebase para el envío de notificaciones push.
